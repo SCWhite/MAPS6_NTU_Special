@@ -18,7 +18,7 @@ SecureKey = "NoKey"
 
 #mcu version
 latest_mcu_version = 980
-ver_app            = "6.1.1"  #change to 6.x.x version for MAPS6
+ver_app            = "6.1.1-a"  #change to 6.x.x version for MAPS6 / 6.1.1-a for NTU project
 
 
 #path
