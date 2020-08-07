@@ -1,0 +1,72 @@
+docker run -it \
+--restart unless-stopped \
+--mount type=bind,source=/sys/class/net/eth0,destination=/sys/class/net/eth0 \
+--mount type=bind,source=/home/pi/MAPS6_Minimum_Viable_Product/data,destination=/home/MAPS6_Minimum_Viable_Product \
+--privileged \
+sean3381212/maps6-mvp
+
+[for MAPS6_MVP]
+docker run -itd --restart unless-stopped \
+--net=host \
+--name maps6_mvp \
+--mount type=bind,source=/home/pi/MAPS6_Minimum_Viable_Product/data,destination=/home/MAPS6_MVP/data \
+--privileged \
+sean3381212/maps6-mvp:latest
+
+
+docker run -it --restart unless-stopped \
+--net=host \
+--name maps6_mvp \
+--mount type=bind,source=/home/pi/MAPS6_Minimum_Viable_Product/data,destination=/home/MAPS6_MVP/data \
+--mount type=bind,source=/dev,destination=/dev \
+--privileged \
+sean3381212/maps6-mvp:latest
+
+
+ docker run -itd --restart unless-stopped \
+ --net=host \
+ --name maps6_mvp \
+ --mount type=bind,source=/home/pi/MAPS6_Minimum_Viable_Product/data,destination=/home/MAPS6_MVP/data \
+ --mount type=bind,source=/dev,destination=/dev \
+ --privileged \
+ sean3381212/maps6-mvp:latest
+
+
+----------------------------------------------------------------------------------------------
+
+[for watchtower]
+docker run -d \
+--name watchtower \
+-v /var/run/docker.sock:/var/run/docker.sock \
+containrrr/watchtower \
+--cleanup
+
+#maps6_mvp
+
+[use this]
+docker run -d \
+    --name watchtower \
+    --restart unless-stopped \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    containrrr/watchtower \
+    --cleanup
+
+
+----------------------------------------------------------------------------------------------
+
+docker cli command
+
+docker container stop maps6_mvp
+docker container rm maps6_mvp
+
+docker run -itd --restart unless-stopped \
+ --net=host \
+ --name maps6_mvp \
+ --mount type=bind,source=/home/pi/MAPS6_Minimum_Viable_Product/data,destination=/home/MAPS6_MVP/data \
+ --mount type=bind,source=/dev,destination=/dev \
+ --privileged \
+ sean3381212/maps6-mvp:latest
+
+
+ docker build -t sean3381212/maps6-mvp .
+ docker push sean3381212/maps6-mvp

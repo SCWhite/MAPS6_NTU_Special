@@ -1,0 +1,3 @@
+#CSV_items =  ['device_id', 'date', 'time', 'Tmp',  'RH',   'PM2.5','PM10', 'PM1.0','RGB_R','RGB_G','RGB_B','RGB_C','Lux',  'CO2',  'TVOC']
+#CSV_type  =  ['string',    'date', 'time', 'float','float','int',  'int',  'int',  'int',  'int'  ,'int',  'int',  'int',  'int',  'int' ]
+CSV_items  =  ['device_id', 'date', 'time', 's_t0', 's_h0', 's_d0', 's_d1', 's_d2', 's_lr', 's_lg', 's_lb', 's_lc', 's_l0', 's_gh', 's_gg']
