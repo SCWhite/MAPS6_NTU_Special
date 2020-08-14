@@ -18,7 +18,7 @@ SecureKey = "NoKey"
 
 #mcu version
 latest_mcu_version = 980
-ver_app            = "6.1.1-a"  #change to 6.x.x version for MAPS6 / 6.1.1-a for NTU project
+ver_app            = "6.2.0-a"  # 6.2.0-a for NTU project(add dB sensor)
 
 
 #path
