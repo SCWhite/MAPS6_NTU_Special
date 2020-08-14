@@ -3,6 +3,7 @@ import serial
 import time
 import libs.MAPS_mcu as mcu
 import libs.MAPS_pi as pi
+import libs.MAPS_pulgin as plugin
 import libs.display as oled
 from datetime import datetime
 
@@ -33,7 +34,12 @@ PM1_AE      = 0
 PM25_AE     = 0
 PM10_AE     = 0
 connection_flag = ""
-
+#for dB sensor
+Leq = 0
+Leq_Max = 0
+Leq_Min = 0
+Leq_Median = 0
+#
 
 def show_task():
     while True:
@@ -46,9 +52,9 @@ def upload_task():
         pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
         #remove GPS if we're not using it
         if(use_GPS == 1):
-            msg = "|gps_lat=" + str(Conf.gps_lat) + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|gps_lon="+ str(Conf.gps_lon) +"|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] 
+            msg = "|gps_lat=" + str(Conf.gps_lat) + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|gps_lon="+ str(Conf.gps_lon) +"|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
         else:
-            msg = "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1]
+            msg = "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
         print("message ready")
         restful_str = Conf.Restful_URL + "topic=" + Conf.APP_ID + "&device_id=" + Conf.DEVICE_ID + "&key=" + Conf.SecureKey + "&msg=" + msg
         try:
@@ -71,9 +77,9 @@ def upload_task():
 def save_task():
     while True:
         time.sleep(Conf.save_interval) #60 seconds
-        #format to ['device_id', 'date', 'time', 'Tmp',  'RH',   'PM2.5','PM10', 'PM1.0','Lux',  'CO2',  'TVOC']
+        #format to ['device_id', 'date', 'time', 'Tmp',  'RH',   'PM2.5','PM10', 'PM1.0','Lux',  'CO2',  'TVOC' ,'Leq','Leq_Max','Leq_Min','Leq_Median']
         pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
-        format_data_list = [Conf.DEVICE_ID,pairs[0],pairs[1],TEMP,HUM,PM25_AE,PM1_AE,PM10_AE,Illuminance,CO2,TVOC]
+        format_data_list = [Conf.DEVICE_ID,pairs[0],pairs[1],TEMP,HUM,PM25_AE,PM1_AE,PM10_AE,Illuminance,CO2,TVOC,Leq,Leq_Max,Leq_Min,Leq_Median]
         try:
             pi.save_data(path,format_data_list) #save to host
             pi.save_to_SD(format_data_list)     #save to SD card
@@ -263,6 +269,13 @@ try:
         PM25_AE     = data_list[17]
         PM10_AE     = data_list[18]
 
+        #for dB sensor
+        Leq         = plugin.Leq
+        Leq_Max     = plugin.Leq_Max
+        Leq_Min     = plugin.Leq_Min
+        Leq_Median  = plugin.Leq_Median
+        #
+
         print("TEMP:" +str(TEMP))
         print("HUM:" +str(HUM))
         print("CO2:" +str(CO2))
@@ -271,6 +284,10 @@ try:
         print("PM1_AE:" +str(PM1_AE))
         print("PM25_AE:" +str(PM25_AE))
         print("PM10_AE:" +str(PM10_AE))
+        print("Leq:" + str(Leq))
+        print("Leq_Max:" + str("Leq_Max))
+        print("Leq_Min:" + str("Leq_Min))
+        print("Leq_Median:" + str(Leq_Median))
         print("------------------------")
 
         #print("storage data") #change to another thread
@@ -289,6 +306,11 @@ try:
         #print("------------------------")
 
         loop = loop + 1
+
+        #prevent overload
+        if(loop > 10000):
+            loop = 0
+
         time.sleep(5)
         print("========================")
 
