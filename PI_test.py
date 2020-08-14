@@ -3,7 +3,7 @@ import serial
 import time
 import libs.MAPS_mcu as mcu
 import libs.MAPS_pi as pi
-import libs.MAPS_pulgin as plugin
+import libs.MAPS_plugin as plugin
 import libs.display as oled
 from datetime import datetime
 
@@ -285,8 +285,8 @@ try:
         print("PM25_AE:" +str(PM25_AE))
         print("PM10_AE:" +str(PM10_AE))
         print("Leq:" + str(Leq))
-        print("Leq_Max:" + str("Leq_Max))
-        print("Leq_Min:" + str("Leq_Min))
+        print("Leq_Max:" + str(Leq_Max))
+        print("Leq_Min:" + str(Leq_Min))
         print("Leq_Median:" + str(Leq_Median))
         print("------------------------")
 
