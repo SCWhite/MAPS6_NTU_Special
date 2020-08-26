@@ -23,6 +23,11 @@ loop = 0
 #or don't use GPS / set to '0'
 use_GPS = 0
 
+#if there is no CO2 module
+#or don't use CO2 / set to '0'
+#default YES
+use_CO2 = 1
+
 
 #preset
 TEMP        = 0
@@ -50,11 +55,23 @@ def upload_task():
     while True:
         time.sleep(Conf.upload_interval) #300 seconds
         pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
-        #remove GPS if we're not using it
+        ##remove GPS if we're not using it
+        #if(use_GPS == 1):
+        #    msg = "|gps_lat=" + str(Conf.gps_lat) + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|gps_lon="+ str(Conf.gps_lon) +"|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
+        #else:
+        #    msg = "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
+
+        #rewrite message packing
+        msg = ""
+
         if(use_GPS == 1):
-            msg = "|gps_lat=" + str(Conf.gps_lat) + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|gps_lon="+ str(Conf.gps_lon) +"|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
-        else:
-            msg = "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID +"|s_g8=" + str(CO2) + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
+            msg = msg + "|gps_lon="+ str(Conf.gps_lon) + "|gps_lat=" + str(Conf.gps_lat)
+        if(use_CO2 == 1):
+            msg = msg + "|s_g8=" + str(CO2)
+
+        msg = msg + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d2=" + str(PM1_AE) + "|s_d0=" + str(PM25_AE) + "|s_d1=" + str(PM10_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
+
+
         print("message ready")
         restful_str = Conf.Restful_URL + "topic=" + Conf.APP_ID + "&device_id=" + Conf.DEVICE_ID + "&key=" + Conf.SecureKey + "&msg=" + msg
         try:
@@ -268,6 +285,13 @@ try:
         PM1_AE      = data_list[16]
         PM25_AE     = data_list[17]
         PM10_AE     = data_list[18]
+
+        #check if there is CO2 moudle on device
+        if(CO2 == 65535):
+            use_CO2 = 0
+        else:
+            use_CO2 = 1
+
 
         #for dB sensor
         Leq         = plugin.Leq

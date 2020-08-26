@@ -18,7 +18,7 @@ SecureKey = "NoKey"
 
 #mcu version
 latest_mcu_version = 980
-ver_app            = "6.2.0-a"  # 6.2.0-a for NTU project(add dB sensor)
+ver_app            = "6.2.1-a"  # 6.2.0-a for NTU project(add dB sensor) / v6.2.1 fix CO2
 
 
 #path

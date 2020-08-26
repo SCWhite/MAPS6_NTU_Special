@@ -153,7 +153,8 @@ def display(DEVICE_ID="",temp=0,hum=0,pm25=0,co2=0,flag="",version=""):
     line("Time: " + str(pairs[1]))
     line("Temp: " + str(temp) + " / " + "RH: " + str(hum))
     line("PM2.5: " + str(pm25) + " um")
-    line("CO2: " + str(co2) + " ppm")
+    if(co2 != 65535):
+        line("CO2: " + str(co2) + " ppm")
     draw.text((80, 51),"v " + version,  font=font, fill=255)
     draw.text((117, 51),flag,  font=font, fill=255)
     #line("IP: " + DEVICE_IP)
