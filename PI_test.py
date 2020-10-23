@@ -17,6 +17,7 @@ Conf = __import__(PATH_OF_CONFIG)
 
 #temperary value
 do_condition        = 1
+nbiot_moudule       = 1
 loop                = 0
 stop_query_sensor   = 0
 initialize_flag     = 0
@@ -100,6 +101,7 @@ def nbiot_sending_task():
     global initialize_flag
     global nbiot_fail_flag
     global stop_query_sensor
+    global nbiot_moudule
 
     while(initialize_flag != 1):
         time.sleep(5)
@@ -109,7 +111,7 @@ def nbiot_sending_task():
     mcu.PROTOCOL_UART_BEGIN(0,4) #use port:0 / set to '4' as 115200 baud
     #mcu.PROTOCOL_UART_BEGIN(0,0)
 
-    while True:
+    while (nbiot_moudule):
         try:
             time.sleep(Conf.nbiot_send_interval * 0.7) #600 seconds/ but in seperate part / to shift away form upload
             stop_query_sensor = 1  #halt getting sensor data for a while
@@ -169,7 +171,17 @@ def nbiot_sending_task():
             #should add clean buffer here
 
             at_cmd = "AT\r"
-            mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+            check_cmd =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+
+            print(check_cmd)
+            print(check_cmd[1])
+            print(type(check_cmd[1]))
+            if(check_cmd[1] == "empty"):
+                print("NO moudle")
+                nbiot_moudule = 0
+                raise 'error'
+            #
+
             time.sleep(1)
             print("----NBIOT init----")
 
@@ -293,6 +305,12 @@ def nbiot_sending_task():
 
         except:
             print("=====NBIOT Fail====")
+
+            #should add clean buffer here
+            mcu.ser.readline()
+            mcu.ser.readline()
+            mcu.ser.readline()
+
             nbiot_fail_flag = 1
             stop_query_sensor = 0 #keep getting data
 
