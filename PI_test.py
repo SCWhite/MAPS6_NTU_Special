@@ -283,6 +283,9 @@ def nbiot_sending_task():
             print("----Chip shut----")
 
             #should add clean buffer here
+            mcu.ser.readline()
+            mcu.ser.readline()
+            mcu.ser.readline()
 
             stop_query_sensor = 0  #resume getting sensor data
             nbiot_fail_flag = 0  #nbiot is good
