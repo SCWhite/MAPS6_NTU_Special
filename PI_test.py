@@ -106,8 +106,8 @@ def nbiot_sending_task():
 
     print("nbiot_sending_task start!!!")
     print(Conf.prifix)
-    #mcu.PROTOCOL_UART_BEGIN(0,4) #use port:0 / set to '4' as 115200 baud
-    mcu.PROTOCOL_UART_BEGIN(0,0)
+    mcu.PROTOCOL_UART_BEGIN(0,4) #use port:0 / set to '4' as 115200 baud
+    #mcu.PROTOCOL_UART_BEGIN(0,0)
 
     while True:
         try:
@@ -182,6 +182,16 @@ def nbiot_sending_task():
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
             time.sleep(1)
             print("----check CSQ-----")
+
+            at_cmd = "AT+CNMP=38\r"
+            mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+            time.sleep(1)
+            print("----LTE only-----")
+
+            at_cmd = "AT+CMNB=2\r"
+            mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+            time.sleep(1)
+            print("----use NB-Iot-----")
 
             at_cmd = "AT+CIPSENDHEX=1\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
