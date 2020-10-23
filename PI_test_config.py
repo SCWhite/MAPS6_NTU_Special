@@ -1,5 +1,15 @@
 import os
 
+#for nbiot
+def formatStrToInt(target):
+    kit = ""
+    for i in range(len(target)):
+        temp=ord(target[i])
+        temp=hex(temp)[2:]
+        kit=kit+str(temp)+" "
+        #print(temp,)
+    return kit
+
 #ID
 DEVICE_ID = "MAPSV6_001"
 
@@ -10,15 +20,15 @@ DEVICE_IP = ""
 APP_ID = "MAPS6"
 
 #GPS
-gps_lat = "25.1933"
-gps_lon = "121.787"
+gps_lat = ""
+gps_lon = ""
 
 #key
 SecureKey = "NoKey"
 
 #mcu version
-latest_mcu_version = 980
-ver_app            = "6.2.1-a"  # 6.2.0-a for NTU project(add dB sensor) / v6.2.1 fix CO2
+latest_mcu_version = 1000
+ver_app            = "6.3.0-a"  # 6.x.x-a for NTU project(add dB sensor) / v6.3.0 add NBIOT
 
 
 #path
@@ -42,14 +52,25 @@ Restful_URL = "https://data.lass-net.org/Upload/MAPS-secure.php?"
 TimeURL = "https://pm25.lass-net.org/util/timestamp.php"
 
 #setting
-GPS_LAT = 25.1933
-GPS_LON = 121.7870
+#GPS_LAT = ""
+#GPS_LON = ""
 
 
 mac = open('/sys/class/net/eth0/address').readline().upper().strip()
 DEVICE_ID = mac.replace(':','')
 
-#interval(seconds)
-show_interval   = 0.3
-upload_interval = 300
-save_interval   = 60
+#CONN/RL/PLEN/MQIsdp/LVL/FL/KA/CIDLEN/ABCDEF/ULEN/maps/PWLEN/iisnrl
+#see more from "mqtt.xlsx"
+connect_pack_pre = "10 28 00 06 4D 51 49 73 64 70 03 C2 00 3C 00 0C "
+Client_ID = formatStrToInt(DEVICE_ID)
+connect_pack_post = "00 04 6D 61 70 73 00 06 69 69 73 6E 72 6C "
+connect_pack = connect_pack_pre + Client_ID + connect_pack_post
+
+prifix = "MAPS/MAPS6/"+DEVICE_ID
+
+
+#interval(in seconds)
+show_interval       = 0.3
+upload_interval     = 300
+save_interval       = 60
+nbiot_send_interval = 600
