@@ -103,8 +103,8 @@ def get_dba_data():
         except:
             ser.close()
             time.sleep(5)
-            print('no MIC or port error!\n')
-            traceback.print_exc()
+            #print('no MIC or port error!\n')
+            #traceback.print_exc()
 
 
 #start MIC sensing
