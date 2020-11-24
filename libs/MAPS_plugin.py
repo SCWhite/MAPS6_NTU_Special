@@ -102,6 +102,14 @@ def get_dba_data():
 
         except:
             ser.close()
+
+            #clear remain data
+            dba_windows.clear()
+            Leq = 0
+            Leq_Max = 0
+            Leq_Min = 0
+            Leq_Median = 0
+
             time.sleep(5)
             #print('no MIC or port error!\n')
             #traceback.print_exc()
