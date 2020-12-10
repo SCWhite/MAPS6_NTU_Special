@@ -144,15 +144,17 @@ def line(in_str,s=FONT_SIZE):
     #show()
     anchor_y = anchor_y + s
 
-def display(DEVICE_ID="",temp=0,hum=0,pm25=0,co2=0,flag="",version=""):
+def display(DEVICE_ID="",temp=0,hum=0,pm25=0,co2=0,tvoc=0,flag="",version=""):
     #oled.clear()
     flush()
     pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
     line("ID: " + DEVICE_ID,14)
-    line("Date: " + str(pairs[0]))
-    line("Time: " + str(pairs[1]))
+    #line("Date: " + str(pairs[0]))
+    #line("Time: " + str(pairs[1]))
+    line("Date: " + str(pairs[0]) + "  " +str(pairs[1]))
     line("Temp: " + str(temp) + " / " + "RH: " + str(hum))
-    line("PM2.5: " + str(pm25) + " um")
+    line("PM2.5: " + str(pm25) + " μg/m3")
+    line("TVOC: " + str(tvoc) + " ppb")
     if(co2 != 65535):
         line("CO2: " + str(co2) + " ppm")
     draw.text((80, 51),"v " + version,  font=font, fill=255)

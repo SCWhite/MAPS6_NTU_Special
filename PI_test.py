@@ -47,7 +47,7 @@ gps_lon = ""
 
 def show_task():
     while True:
-        oled.display(Conf.DEVICE_ID,TEMP,HUM,PM25_AE,CO2,connection_flag,Conf.ver_app)
+        oled.display(Conf.DEVICE_ID,TEMP,HUM,PM25_AE,CO2,TVOC,connection_flag,Conf.ver_app)
         time.sleep(Conf.show_interval) #0.3 seconds / use about 18% cpu on PI3
 
 def upload_task():
