@@ -62,7 +62,10 @@ def upload_task():
         if(CO2 != 65535):
             msg = msg + "|s_g8=" + str(CO2)
 
-        msg = msg + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d0=" + str(PM25_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
+        msg = msg + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d0=" + str(PM25_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1]
+
+        if((Leq != 0)and(Leq != inf)):
+            msg = msg + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
 
         print("message ready")
         restful_str = Conf.Restful_URL + "topic=" + Conf.APP_ID + "&device_id=" + Conf.DEVICE_ID + "&key=" + Conf.SecureKey + "&msg=" + msg
@@ -102,6 +105,7 @@ def nbiot_sending_task():
     global nbiot_fail_flag
     global stop_query_sensor
     global nbiot_moudule
+    global gps_lat,gps_lon
 
     while(initialize_flag != 1):
         time.sleep(5)
@@ -116,6 +120,74 @@ def nbiot_sending_task():
             time.sleep(Conf.nbiot_send_interval * 0.7) #600 seconds/ but in seperate part / to shift away form upload
             stop_query_sensor = 1  #halt getting sensor data for a while
 
+            #check if the nbiot module is on board
+            at_cmd = "AT\r"
+            check_cmd =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+
+            print(check_cmd)
+            print(check_cmd[1])
+            print(type(check_cmd[1]))
+            if(check_cmd[1] == "empty"):
+                print("NO moudle")
+                nbiot_moudule = 0
+                raise 'error'
+
+            #get GPS info
+            at_cmd = "AT+CGNSPWR=1\r"
+            mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+
+            at_cmd = "AT+CGNSINF\r"
+            gps_info =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+
+            print("@@This is GPS 1 @@")
+            print(gps_info)
+
+
+            gps_info_str = ""
+
+            for i in range(len(gps_info[1])):
+                gps_info_str = gps_info_str + chr(gps_info[1][i])
+
+
+            gps_info_str = gps_info_str.replace("\n","").replace("\r","").replace("OK","")
+            gps_info_str = gps_info_str.split(":")[1]
+            gps_info_str = gps_info_str.strip(" ")
+            gps_info_str = gps_info_str.split(",")
+
+            print("@@This is GPS 2 @@")
+            print(gps_info_str)
+
+
+            #check if it is empty here
+            if(gps_info_str[1] == "1"):
+
+                gps_lat   = gps_info_str[3]
+                #gps_lat_a = int(gps_lat[:2])
+                #gps_lat_b = float(gps_lat[2:])
+                #gps_lat   = round(gps_lat_a + (gps_lat_b/60),4)
+                #gps_lat   = str(gps_lat)
+
+                #gps_NS    = gps_info_str[1]
+
+                gps_lon   = gps_info_str[4]
+                #gps_lon_a = int(gps_lon[:3])
+                #gps_lon_b = float(gps_lon[3:])
+                #gps_lon   = round(gps_lon_a + (gps_lon_b/60),4)
+                #gps_lon   = str(gps_lon)
+
+                #gps_EW    = gps_info_str[3]
+                #gps_date  = gps_info_str[4]
+                #gps_time  = gps_info_str[5]
+                #gps_alt   = gps_info_str[6]
+                gps_speed = gps_info_str[6]
+                #gps_speed = round(float(gps_speed)*1.852,4)
+            else:
+                print("no GPS")
+                gps_lat = ""
+                gps_lon = ""
+
+#
+
             pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
 
             msg = ""
@@ -126,7 +198,12 @@ def nbiot_sending_task():
             if(CO2 != 65535):
                 msg = msg + "|s_g8=" + str(CO2)
 
-            msg = msg + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d0=" + str(PM25_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
+            msg = msg + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d0=" + str(PM25_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1] 
+
+            if((Leq != 0)and(Leq != inf)):
+                msg = msg + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
+
+            msg = msg + "|MQ"
 
             print("------------------------")
             print("msg_for_nbiot:",msg)
@@ -170,19 +247,19 @@ def nbiot_sending_task():
 
             #should add clean buffer here
 
-            at_cmd = "AT\r"
-            check_cmd =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
+            #at_cmd = "AT\r"
+            #check_cmd =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
 
-            print(check_cmd)
-            print(check_cmd[1])
-            print(type(check_cmd[1]))
-            if(check_cmd[1] == "empty"):
-                print("NO moudle")
-                nbiot_moudule = 0
-                raise 'error'
+            #print(check_cmd)
+            #print(check_cmd[1])
+            #print(type(check_cmd[1]))
+            #if(check_cmd[1] == "empty"):
+            #    print("NO moudle")
+            #    nbiot_moudule = 0
+            #    raise 'error'
             #
 
-            time.sleep(1)
+            #time.sleep(1)
             print("----NBIOT init----")
 
             at_cmd = "AT+CIPSHUT\r"
