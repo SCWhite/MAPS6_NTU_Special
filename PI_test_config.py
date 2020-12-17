@@ -28,7 +28,7 @@ SecureKey = "NoKey"
 
 #mcu version
 latest_mcu_version = 1000
-ver_app            = "6.3.4-a"  # 6.x.x-a for NTU project(add dB sensor) / v6.3.4 modify display 
+ver_app            = "6.4.0-a"  # 6.x.x-a for NTU project(add dB sensor) / v6.4.0 fix GPS, now works better
 
 
 #path

@@ -124,9 +124,9 @@ def nbiot_sending_task():
             at_cmd = "AT\r"
             check_cmd =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
 
-            print(check_cmd)
-            print(check_cmd[1])
-            print(type(check_cmd[1]))
+            #print(check_cmd)
+            #print(check_cmd[1])
+            #print(type(check_cmd[1]))
             if(check_cmd[1] == "empty"):
                 print("NO moudle")
                 nbiot_moudule = 0
@@ -139,8 +139,8 @@ def nbiot_sending_task():
             at_cmd = "AT+CGNSINF\r"
             gps_info =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
 
-            print("@@This is GPS 1 @@")
-            print(gps_info)
+            #print("@@This is GPS 1 @@")
+            #print(gps_info)
 
 
             gps_info_str = ""
@@ -260,7 +260,7 @@ def nbiot_sending_task():
             #
 
             #time.sleep(1)
-            print("----NBIOT init----")
+            #print("----NBIOT init----")
 
             at_cmd = "AT+CIPSHUT\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
@@ -269,32 +269,32 @@ def nbiot_sending_task():
 
             at_cmd = "AT+CSQ\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
-            print("----check CSQ-----")
+            #time.sleep(1)
+            #print("----check CSQ-----")
 
             at_cmd = "AT+CNMP=38\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
-            print("----LTE only-----")
+            #time.sleep(1)
+            #print("----LTE only-----")
 
             at_cmd = "AT+CMNB=2\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
-            print("----use NB-Iot-----")
+            #time.sleep(1)
+            #print("----use NB-Iot-----")
 
             at_cmd = "AT+CIPSENDHEX=1\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
+            #time.sleep(1)
             #print("-------HEX---------")
 
             at_cmd = "AT+CGREG?\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
+            #time.sleep(1)
             #print("-------CGREG---------")
 
             at_cmd = "AT+CGATT?\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
+            #time.sleep(1)
             #print("-------CGATT---------")
 
             at_cmd = "AT+CGNAPN\r"
@@ -328,13 +328,13 @@ def nbiot_sending_task():
 
             at_cmd = "AT+CIICR\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
+            #time.sleep(1)
             #print("------CIICR----------")
 
             at_cmd = "AT+CIFSR\r"
             mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
-            time.sleep(1)
-            print("----Get IP-----")
+            #time.sleep(1)
+            #print("----Get IP-----")
 
 
             at_cmd = "AT+CIPSTART=\"TCP\",\"35.162.236.171\",\"8883\"\r"
