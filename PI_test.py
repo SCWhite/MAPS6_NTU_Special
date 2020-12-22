@@ -38,6 +38,7 @@ Leq         = 0
 Leq_Max     = 0
 Leq_Min     = 0
 Leq_Median  = 0
+
 #location data
 gps_lat = ""
 gps_lon = ""
@@ -613,7 +614,8 @@ try:
 
 
         #for dB sensor
-        Leq         = plugin.Leq
+        #Leq         = plugin.Leq
+        Leq         = plugin.min_leq
         Leq_Max     = plugin.Leq_Max
         Leq_Min     = plugin.Leq_Min
         Leq_Median  = plugin.Leq_Median
