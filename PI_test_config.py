@@ -28,7 +28,7 @@ SecureKey = "NoKey"
 
 #mcu version
 latest_mcu_version = 1000
-ver_app            = "6.4.1-a"  # 6.x.x-a for NTU project(add dB sensor) / v6.4.1 fix handling "inf" problem
+ver_app            = "6.4.3-a"  # 6.x.x-a for NTU project(add dB sensor) / v6.4.3 increase upload frequency
 
 
 #path
@@ -71,6 +71,6 @@ prifix = "MAPS/MAPS6/"+DEVICE_ID
 
 #interval(in seconds)
 show_interval       = 0.3
-upload_interval     = 300
-save_interval       = 60
+upload_interval     = 60
+save_interval       = 1
 nbiot_send_interval = 600

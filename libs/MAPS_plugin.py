@@ -26,10 +26,11 @@ min_leq = 0
 all_slot_energy = 0
 all_slot_count  = 0
 
+temp_list = []
 
 #notice: we use a sliding windows to calculate Max/Min/Mid
 # one goes in, one come out
-dba_windows = deque(maxlen=60)
+dba_windows = deque(maxlen=1)
 
 
 """
@@ -80,6 +81,9 @@ def get_dba_data():
 
                         data_set = data.strip().split(" ")
 
+                        #add list for calc Max/min
+                        temp_list.append(float(data_set[1]))
+
                         #caculate dba to energy
                         slot_energy =  slot_energy + transfer_to_eng(float(data_set[1]))
 
@@ -109,9 +113,14 @@ def get_dba_data():
                     min_leq = math.log10(all_slot_energy / all_slot_count) * 10
                     min_leq = round(min_leq,2)
 
-                    Leq_Max = max(dba_windows)
-                    Leq_Min = min(dba_windows)
-                    Leq_Median = round(median(dba_windows),2)
+                    #use temp_list for Max/min
+                    #Leq_Max = max(dba_windows)
+                    #Leq_Min = min(dba_windows)
+                    #Leq_Median = round(median(dba_windows),2)
+                    Leq_Max = max(temp_list)
+                    Leq_Min = min(temp_list)
+                    Leq_Median = round(median(temp_list),2)
+
 
                     #print("Leq: " + str(Leq) + "\n")
                     #print("------------------")
@@ -126,6 +135,7 @@ def get_dba_data():
                     slot_count  = 0
                     all_slot_energy = 0
                     all_slot_count  = 0
+                    temp_list.clear()
                     last_time_stamp = time_stamp
 
 

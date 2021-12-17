@@ -642,7 +642,7 @@ try:
         if(loop > 10000):
             loop = 0
 
-        time.sleep(5)
+        time.sleep(1)
         print("========================")
 
 except KeyboardInterrupt:
