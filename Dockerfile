@@ -89,9 +89,9 @@ ARG OPENSSL_LIB_PATH
 ARG SIG_ALG
 ENV SIG_ALG=${SIG_ALG}
 ARG BROKER_IP
-ENV BROKER_IP=${BROKER_IP}
+ENV BROKER_IP=34.215.240.96
 ARG PUB_IP
-ENV PUB_IP=${PUB_IP}
+ENV PUB_IP=60.250.153.181
 
 ## ------ Original Setting ------
 RUN apt-get update && apt-get install -y \
