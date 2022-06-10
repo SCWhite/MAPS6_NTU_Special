@@ -28,7 +28,7 @@ SecureKey = "NoKey"
 
 #mcu version
 latest_mcu_version = 1000
-ver_app            = "6.4.3-a"  # 6.x.x-a for NTU project(add dB sensor) / v6.4.3 increase upload frequency
+ver_app            = "6.5.0-a"  # 6.x.x-a for NTU project(add dB sensor) / v6.5.0 add PQC function
 
 
 #path
