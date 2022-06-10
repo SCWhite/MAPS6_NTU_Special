@@ -121,7 +121,7 @@ COPY --from=builder $OPENSSL_LIB_PATH  $OPENSSL_LIB_PATH
 COPY --from=builder /usr/local/lib  /usr/local/lib
 COPY --from=builder /usr/local/bin  /usr/local/bin
 COPY --from=builder /usr/local/sbin  /usr/local/sbin
-#COPY --from=builder /usr/lib/arm-linux-gnueabihf/libcjson.so.1 /usr/lib/arm-linux-gnueabihf
+COPY --from=builder /usr/lib/arm-linux-gnueabihf/libcjson.so.1 /usr/lib/arm-linux-gnueabihf
 
 # Dynamically link to mosquitto
 RUN ln -s /usr/local/lib/libmosquitto.so.1 /usr/lib/libmosquitto.so.1 && ldconfig
