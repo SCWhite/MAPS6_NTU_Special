@@ -5,24 +5,12 @@ import libs.MAPS_mcu as mcu
 import libs.MAPS_pi as pi
 import libs.MAPS_plugin as plugin
 import libs.display as oled
+import paho.mqtt.client as mqtt
 from datetime import datetime
 
 import requests
 import threading
 import subprocess
-
-# ------- Generate certificate & key ------- #
-# generate the new publisher CSR using pre-set CA.key & cert
-p = subprocess.Popen("openssl req -new -newkey " + os.environ.get('SIG_ALG') + " -keyout /home/MAPS6_MVP/certs/publisher.key -out /home/MAPS6_MVP/certs/publisher.csr -nodes -subj \"/O=test-publisher/CN=" + os.environ.get('PUB_IP') + "\"", shell=True)
-p.wait()
-
-# generate the publisher cert
-subprocess.Popen("openssl x509 -req -in /home/MAPS6_MVP/certs/publisher.csr -out /home/MAPS6_MVP/certs/publisher.crt -CA /home/MAPS6_MVP/certs/CA.crt -CAkey /home/MAPS6_MVP/certs/CA.key -CAcreateserial -days 365", shell=True)
-p.wait()
-
-# modify file permissions
-subprocess.Popen("chmod 777 /home/MAPS6_MVP/certs/*", shell=True)
-p.wait()
 
 
 #import current file's config, by getting the script name with '.py' replace by '_confg'
@@ -58,6 +46,12 @@ Leq_Median  = 0
 gps_lat = ""
 gps_lon = ""
 
+
+broker_address = os.environ.get('BROKER_IP')
+port = int(os.environ.get('BROKER_PORT'))
+username = os.environ.get('BROKER_USER')
+password = os.environ.get('BROKER_PASS')
+
 #open debug mode
 #mcu.debug = 1
 
@@ -67,37 +61,38 @@ def show_task():
         time.sleep(Conf.show_interval) #0.3 seconds / use about 18% cpu on PI3
 
 def upload_task():
+    client = mqtt.Client()
+    client.username_pw_set(username, password)
+
     while True:
         time.sleep(Conf.upload_interval) #300 seconds
         pairs = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S").split(" ")
 
         msg = ""
-        mqtt_msg = ""
+        #mqtt_msg = ""
 
         if((gps_lat != "") and (gps_lon != "")):
             msg = msg + "|gps_lon=" + gps_lon + "|gps_lat=" + gps_lat
-            mqtt_msg = mqtt_msg + "\",\"gps_lon\":\"" + gps_lon + "\",\"gps_lat\":\"" + gps_lat
         if(CO2 != 65535):
             msg = msg + "|s_g8=" + str(CO2)
-            mqtt_msg = mqtt_msg + "\",\"s_g8\":\"" + str(CO2)
 
         msg = msg + "|s_t0=" + str(TEMP) + "|app=" + str(Conf.APP_ID) + "|date=" + pairs[0] + "|s_d0=" + str(PM25_AE) + "|s_h0=" + str(HUM) + "|device_id=" + Conf.DEVICE_ID + "|s_gg=" + str(TVOC) + "|ver_app=" + str(Conf.ver_app) + "|time=" + pairs[1]
-        mqtt_msg = mqtt_msg + "\",\"s_t0\":\"" + str(TEMP) + "\",\"app\":\"" + str(Conf.APP_ID) + "\",\"date\":\"" + pairs[0] + "\",\"s_d0\":\"" + str(PM25_AE) + "\",\"s_h0\":\"" + str(HUM) + "\",\"device_id\":\"" + Conf.DEVICE_ID + "\",\"s_gg\":\"" + str(TVOC) + "\",\"ver_app\":\"" + str(Conf.ver_app) + "\",\"time\":\"" + pairs[1]
 
         if((Leq != 0)and(Leq != float("inf"))):
             msg = msg + "|s_s0=" + str(Leq_Median) + "|s_s0M=" + str(Leq_Max) + "|s_s0m=" + str(Leq_Min) + "|s_s0L=" + str(Leq)
-            mqtt_msg = mqtt_msg + "\",\"s_s0\":\"" + str(Leq_Median) + "\",\"s_s0M\":\"" + str(Leq_Max) + "\",\"s_s0m\":\"" + str(Leq_Min) + "\",\"s_s0L\":\"" + str(Leq)
 
-        #use mosquitto_pub to publish data
         print("message ready!!")
-        mqtt_msg = "{" + mqtt_msg + "\"}"  # json format
-        mqtt_msg = mqtt_msg.replace(",", "", 1)
-        mqtt_msg = mqtt_msg.replace("\"", "", 1)
-        p = subprocess.Popen("mosquitto_pub -h " + os.environ.get('BROKER_IP') + " -m " + mqtt_msg + " -t test/sensor1 -q 0 -i \"" + Conf.DEVICE_ID + "\" -d \
-        --tls-version tlsv1.3 --cafile /home/MAPS6_MVP/certs/CA.crt --cert /home/MAPS6_MVP/certs/publisher.crt --key /home/MAPS6_MVP/certs/publisher.key", shell=True)
-        p.wait()
-        print("message sent!!")
-        
+        #print(msg)
+
+        try:
+            client.connect(broker_address, port)
+            client.publish("MAPS/MAPS6/" + Conf.DEVICE_ID, msg)
+            client.disconnect()
+
+            print("message sent!!")
+        except:
+            print("internet err!!")
+
         # restful_str = Conf.Restful_URL + "topic=" + Conf.APP_ID + "&device_id=" + Conf.DEVICE_ID + "&key=" + Conf.SecureKey + "&msg=" + msg
         # try:
         #     r = requests.get(restful_str)
@@ -154,9 +149,6 @@ def nbiot_sending_task():
             at_cmd = "AT\r"
             check_cmd =  mcu.PROTOCOL_UART_TXRX_EX(0,at_cmd.encode(),250,3000)
 
-            #print(check_cmd)
-            #print(check_cmd[1])
-            #print(type(check_cmd[1]))
             if(check_cmd[1] == "empty"):
                 print("NO moudle")
                 nbiot_moudule = 0
@@ -192,23 +184,7 @@ def nbiot_sending_task():
             if(gps_info_str[1] == "1"):
 
                 gps_lat   = gps_info_str[3]
-                #gps_lat_a = int(gps_lat[:2])
-                #gps_lat_b = float(gps_lat[2:])
-                #gps_lat   = round(gps_lat_a + (gps_lat_b/60),4)
-                #gps_lat   = str(gps_lat)
-
-                #gps_NS    = gps_info_str[1]
-
                 gps_lon   = gps_info_str[4]
-                #gps_lon_a = int(gps_lon[:3])
-                #gps_lon_b = float(gps_lon[3:])
-                #gps_lon   = round(gps_lon_a + (gps_lon_b/60),4)
-                #gps_lon   = str(gps_lon)
-
-                #gps_EW    = gps_info_str[3]
-                #gps_date  = gps_info_str[4]
-                #gps_time  = gps_info_str[5]
-                #gps_alt   = gps_info_str[6]
                 gps_speed = gps_info_str[6]
                 #gps_speed = round(float(gps_speed)*1.852,4)
             else:
